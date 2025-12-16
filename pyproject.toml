@@ -1,0 +1,36 @@
+[tool.pdm]
+[project]
+name = "test"
+version = "1.0"
+description = "I am testing"
+authors = [
+    {name = "hamberg", email = "hedwig.amberg@ionos.com"},
+]
+dependencies = [
+    "filetype", # for kivy
+    "docutils", # for kivy
+    "Kivy-Garden", # for kivy
+    "pygments", # for kivy
+    "requests", # for kivy
+    "pygame" # for kivy
+]
+requires-python = ">=3.10"
+[project.optional-dependencies]
+test = [
+]
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.black]
+target-version = ["py311"]
+line-length = 100
+
+[tool.autopep8]
+max_line_length = 100
+
+[tool.flake8]
+#ignore = []
+#per-file-ignores = []
+max-line-length = 100
+count = true
