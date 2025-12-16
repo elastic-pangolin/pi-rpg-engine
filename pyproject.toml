@@ -4,7 +4,7 @@ name = "test"
 version = "1.0"
 description = "I am testing"
 authors = [
-    {name = "hamberg", email = "hedwig.amberg@ionos.com"},
+    {name = "elastic-pangolin"},
 ]
 dependencies = [
     "filetype", # for kivy
