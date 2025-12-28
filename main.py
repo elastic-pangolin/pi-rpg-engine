@@ -12,21 +12,28 @@ from kivy.core.window import Window
 
 from menu import *
 
-# Define your button callbacks
-def func_play():
-    print("Button 'play' clicked")
-
-def func_exit():
-    print("Button 'exit' clicked")
-    App.get_running_app().stop()
-
 # App class
 class MyApp(App):
+    root = None
+
+    # Define your button callbacks
+    def func_play(self):
+        print("Button 'play' clicked")
+        demo_menu = MenuLayout("")
+        demo_menu.add_button(self.func_exit, text="EXIT DEMO")
+        self.root.show(demo_menu)
+
+    def func_exit(self):
+        print("Button 'exit' clicked")
+        App.get_running_app().stop()
+
     def build(self):
+        self.root = ScreenRoot()
         main_menu = MenuLayout("pics/menus/main.jpg")
-        main_menu.add_button(func_play, text="play")
-        main_menu.add_button(func_exit, text="exit")
-        return main_menu
+        main_menu.add_button(self.func_play, text="play")
+        main_menu.add_button(self.func_exit, text="exit")
+        self.root.show(main_menu)
+        return self.root
 
 if __name__ == '__main__':
     MyApp().run()

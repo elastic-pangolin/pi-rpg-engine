@@ -1,8 +1,15 @@
 from kivy.graphics import Rectangle
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
+from kivy.uix.floatlayout import FloatLayout
 
 from buttons import *
+
+# object to hold all layouts
+class ScreenRoot(FloatLayout):
+    def show(self, widget):
+        self.clear_widgets()
+        self.add_widget(widget)
 
 # Menu layout
 class MenuLayout(BoxLayout):
