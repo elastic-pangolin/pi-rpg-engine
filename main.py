@@ -1,16 +1,16 @@
-from kivy.app import App
-from kivy.core.window import Window
-
-from menu import *
-
 from kivy.config import Config
 Config.set('graphics', 'fullscreen', '0')
 Config.set('graphics', 'resizable', '0')
-Config.set('graphics', 'width', '400')
-Config.set('graphics', 'height', '600')
+Config.set('graphics', 'resizable', False)
+Config.set('graphics', 'width', '768')
+Config.set('graphics', 'height', '512')
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
-#KIVY_METRICS_DENSITY=1
+from kivy.app import App
+from kivy.core.window import Window
+
+
+from menu import *
 
 # Define your button callbacks
 def func_play():
@@ -29,5 +29,4 @@ class MyApp(App):
         return main_menu
 
 if __name__ == '__main__':
-    #Window.size = (768,512) # Fix the window size
     MyApp().run()
