@@ -34,9 +34,26 @@ class MenuLayout(BoxLayout):
         self.title_rect.size = self.title_label.texture.size
         self._update_all()
 
+    @staticmethod
+    def _layout_text(text: str, width: int):
+        words = str(text).split()
+        lines = []
+        current_line = ""
+        for word in words:
+            if len(current_line) + len(word) + 1 <= width:
+                current_line += (word if not current_line else " " + word)
+            else:
+                lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+        return "\n".join(lines).replace("[LB]", "\n") # [LB] are literal linebreaks
+
     def __init__(self, image_source, text, **kwargs):
         super().__init__(**kwargs)
         
+        if not image_source:
+            image_source = "dark_grey.png"
         self.source = image_source
         #self.size = img_size
         self.orientation = 'vertical'
@@ -48,7 +65,8 @@ class MenuLayout(BoxLayout):
 
         # Core text label (drawn, not widget)
         self.title_label = CoreLabel(
-            text=text,
+            text=self._layout_text(text, 50),
+            halign='center',
             font_name="UI",
             font_size=dp(36),
             color=(1, 1, 1, 1)
