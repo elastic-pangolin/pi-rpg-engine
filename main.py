@@ -2,6 +2,7 @@ import os
 import sys
 import json
 
+
 from kivy.config import Config
 Config.set('graphics', 'fullscreen', '0')
 Config.set('graphics', 'resizable', '0')
@@ -26,19 +27,8 @@ from kivy.resources import resource_add_path
 resource_add_path(".")
 
 from menu import *
+from game import *
 
-class Game:
-    def __init__(self):
-        self.state = {}
-
-    def load_savefile(self, path):
-        ...
-
-    def write_savefile(self, path):
-        ...
-
-    def persist(self, key: str, value):
-        self.state[key] = value
 
 # App class
 class RPG(App):
@@ -51,31 +41,31 @@ class RPG(App):
     # Start series of layouts from game.json file
     def func_play(self):
         #print("Button 'play' clicked")
-        game_screens = list()
-        # TODO: fill with screen objects from data dict
-        #with open("game.json", "r") as gamefile:
-        #    data = json.load(gamefile)
-        print("Loading game ...")
-        #for entry in data:
-        #   ...
-        game_screens = [None] * 10 # Dummy indices: DELETE
-        print(f"Game loaded: {len(game_screens)} screens")
-
-        self.screens = [self.screens[0]] + game_screens # game screen indices start at 1 !!!
-        
-        # TODO: when to load save?
         self.game = Game()
+        game_screens = list()
+        filepath = "rpg-engine/test-game.json"
+        if os.path.exists(filepath):
+            with open(filepath, "r") as gamefile:
+                print(f"Loading game from {filepath} ...")
+                data = json.load(gamefile)
+                game_screens = self.game.create_screens(self, data)
+                print(f"Game loaded: {len(game_screens)} screens")
 
-        # DEMO: overwrite screens with demo
-        demo_intro = MenuLayout("", "DEMO")
-        demo_intro.add_animation(lambda: self.func_advance(2), gif="pics/animations/cat-3.gif")
-        self.screens[1] = demo_intro
+        # TODO: when to load save?
+
+        if not len(game_screens) > 0:
+            self.screens = [self.screens[0]] + [None] * 2
+            # DEMO: overwrite screens with demo
+            demo_intro = MenuLayout("", "DEMO")
+            demo_intro.add_animation(lambda: self.func_advance(2), gif="pics/animations/cat-3.gif")
+            self.screens[1] = demo_intro
         
-        demo_menu = MenuLayout("pics/menus/main.jpg", "DEMO")
-        demo_menu.add_button(self.func_exit, text="EXIT DEMO")
-        demo_menu.add_button(self.func_reset, text="RETURN TO MAIN MENU")
-        self.screens[2] = demo_menu
-        
+            demo_menu = MenuLayout("pics/menus/main.jpg", "DEMO")
+            demo_menu.add_button(self.func_exit, text="EXIT DEMO")
+            demo_menu.add_button(self.func_reset, text="RETURN TO MAIN MENU")
+            self.screens[2] = demo_menu
+        else:
+            self.screens = [self.screens[0]] + game_screens # game screen indices start at 1 !!!
         
         self.root.show(self.screens[1]) # show first game screen at index 1
 
