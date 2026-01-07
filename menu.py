@@ -4,6 +4,9 @@ from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.text import Label as CoreLabel
 from kivy.metrics import dp
+from kivy.clock import Clock
+
+from PIL import Image as GifImage
 
 from buttons import *
 
@@ -60,6 +63,26 @@ class MenuLayout(BoxLayout):
 
         self.bind(size=self._update_all, pos=self._update_all)
         self._update_all()
+
+    def _schedule_after_gif(self, func):
+        gifimg = GifImage.open(self.gif.source)
+        frame_count = gifimg.n_frames
+        duration = frame_count * self.gif.anim_delay
+        print(f"DEBUG: found {frame_count} frames for a total of {duration} seconds")
+        # Kivy always passes dt, so wrap your function
+        #Clock.schedule_once(lambda dt: func(), duration)
+        Clock.schedule_once(lambda dt: func(), duration)
+
+    def add_animation(self, func='UNDEFINED', gif=None):
+        if not func and not gif:
+            return # nothing to do
+        self.gif = Image(
+            source=gif,
+            anim_delay=1/24
+        )
+        self.add_widget(self.gif)
+        if not func == 'UNDEFINED':
+            Clock.schedule_once(lambda dt: self._schedule_after_gif(func), 0)
 
     def add_button(self, func, text=None, img=None):
         if img:
