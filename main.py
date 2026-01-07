@@ -43,7 +43,7 @@ class RPG(App):
         #print("Button 'play' clicked")
         self.game = Game()
         game_screens = list()
-        filepath = "rpg-engine/test-game.json"
+        filepath = "test-game.json"
         if os.path.exists(filepath):
             with open(filepath, "r") as gamefile:
                 print(f"Loading game from {filepath} ...")

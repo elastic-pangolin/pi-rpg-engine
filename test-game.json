@@ -1,0 +1,179 @@
+{
+    "menuKeys": {
+        "M": "system",
+        "S": "save",
+        "L": "load"
+    },
+    "menus": [
+        {
+            "name": "system",
+            "frame": "MENU",
+            "header": "System Menu",
+            "description": "TEXT ADVENTURE SIMULATOR",
+            "options": [
+                {
+                    "text": "New Game/Continue",
+                    "actions": [
+                        {
+                            "command": "Transition",
+                            "details": {
+                                "nextScreen": "road1"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "Save",
+                    "actions": [
+                        {
+                            "command": "Save",
+                            "details": {}
+                        }
+                    ]
+                },
+                {
+                    "text": "Load",
+                    "actions": [
+                        {
+                            "command": "Transition",
+                            "details": {
+                                "nextScreen": "load"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "Exit",
+                    "actions": [
+                        {
+                            "command": "Exit",
+                            "details": {}
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "load",
+            "frame": "MENU",
+            "header": "Choose Save File",
+            "description": "",
+            "options": []
+        }
+    ],
+    "screens": [
+        {
+            "name": "road1",
+            "frame": "NOFRAME",
+            "header": "Dark Alley",
+            "description": "You stand on a narrow cobblestone pathway between sinister buildings. It is nighttime, and no windows are lit except the display of a small shop to the north.",
+            "options": [
+                {
+                    "text": "Look at the shop display",
+                    "actions": [
+                        {
+                            "command": "Noop",
+                            "details": {
+                                "message": "The glass is so dirty you can't make out the items on display."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "Look into the gutter",
+                    "actions": [
+                        {
+                            "command": "Noop",
+                            "details": {
+                                "message": "You find 3 goldcoins!"
+                            }
+                        },
+                        {
+                            "command": "AddItem",
+                            "details": {
+                                "itemName": "goldcoin",
+                                "amount": 3
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "Enter the shop",
+                    "actions": [
+                        {
+                            "command": "Transition",
+                            "details": {
+                                "nextScreen": "shop"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "shop",
+            "frame": "NOFRAME",
+            "header": "The Olde Shoppe",
+            "description": "The shopkeep stares you down aggressively from behind his counter. What do you want to buy?",
+            "options": [
+                {
+                    "text": "A dead rat (2 GP)",
+                    "actions": [
+                        {
+                            "command": "LooseItem",
+                            "details": {
+                                "itemName": "goldcoin",
+                                "amount": 2,
+                                "failureMessage": "You do not have enough money!"
+                            }
+                        },
+                        {
+                            "command": "AddItem",
+                            "details": {
+                                "itemName": "rat",
+                                "amount": 1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "A green spotted egg (5 GP)",
+                    "actions": [
+                        {
+                            "command": "LooseItem",
+                            "details": {
+                                "itemName": "goldcoin",
+                                "amount": 5,
+                                "failureMessage": "You do not have enough money!"
+                            }
+                        },
+                        {
+                            "command": "AddItem",
+                            "details": {
+                                "itemName": "egg",
+                                "amount": 1
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "items": [
+        {
+            "name": "goldcoin",
+            "displayNameSingular": "Golden Coin",
+            "displayNamePlural": "Golden Coins"
+        },
+        {
+            "name": "rat",
+            "displayNameSingular": "Rat Cadaver",
+            "displayNamePlural": "Rat Cadavers"
+        },
+        {
+            "name": "egg",
+            "displayNameSingular": "Green Egg",
+            "displayNamePlural": ""
+        }
+    ]
+}
