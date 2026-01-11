@@ -32,12 +32,15 @@ class ScreenRoot(FloatLayout):
         self.add_widget(widget)
 
 class Overlay(Widget):
-    def __init__(self, parent_size, img_source, text, **kwargs):
+    def __init__(self, parent_size, parent_frac, img_source, text, **kwargs):
         super().__init__(**kwargs)
         if not img_source:
-            img_source = "dark_grey.png"
-        self.width = parent_size[0] * 0.45
-        self.height = parent_size[1] * 0.45
+            img_source = "light_grey.png"
+        self.width = parent_size[0] * parent_frac
+        self.height = parent_size[1] * parent_frac
+        
+        text_len = int((self.width - dp(36)) / dp(36))
+        
         self.size_hint = (None, None) # do not resize
         self.pos = (
             parent_size[0]*0.5 - self.width/2,
@@ -48,7 +51,7 @@ class Overlay(Widget):
             self.bg.texture.wrap = 'repeat' #'clamp_to_edge'
             self.bg.texture.uvsize = (1,-1)
         self.label = CoreLabel(
-            text=_layout_text(text,20),
+            text=_layout_text(text,text_len),
             font_name="UI",
             font_size=dp(36),
             halign='center',
