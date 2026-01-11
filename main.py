@@ -29,7 +29,6 @@ resource_add_path(".")
 from menu import *
 from game import *
 
-
 # App class
 class RPG(App):
     def __init__(self):
@@ -54,20 +53,25 @@ class RPG(App):
         # TODO: when to load save?
 
         if not len(game_screens) > 0:
-            self.screens = [self.screens[0]] + [None] * 2
-            # DEMO: overwrite screens with demo
-            demo_intro = MenuLayout("", "DEMO")
-            demo_intro.add_animation(lambda: self.func_advance(2), gif="pics/animations/cat-3.gif")
-            self.screens[1] = demo_intro
-        
-            demo_menu = MenuLayout("pics/menus/main.jpg", "DEMO")
-            demo_menu.add_button(self.func_exit, text="EXIT DEMO")
-            demo_menu.add_button(self.func_reset, text="RETURN TO MAIN MENU")
-            self.screens[2] = demo_menu
+            print("An error occurred loading the game!")
         else:
             self.screens = [self.screens[0]] + game_screens # game screen indices start at 1 !!!
         
         self.root.show(self.screens[1]) # show first game screen at index 1
+
+    def func_demo(self):
+        self.screens = [self.screens[0]] + [None] * 2
+        # DEMO: overwrite screens with demo
+        demo_intro = MenuLayout("", "DEMO")
+        demo_intro.add_animation(lambda: self.func_advance(2), gif="pics/animations/cat-3.gif")
+        self.screens[1] = demo_intro
+    
+        demo_menu = MenuLayout("pics/menus/main.jpg", "DEMO")
+        demo_menu.add_button(self.func_exit, text="EXIT DEMO")
+        demo_menu.add_button(self.func_reset, text="RETURN TO MAIN MENU")
+        demo_menu.add_button(lambda: self.func_overlay("pics/menus/main.jpg", "TEST"), text="test overlay")
+        self.screens[2] = demo_menu
+
 
     # ============== general functions : ==============
     # exit game
@@ -89,6 +93,10 @@ class RPG(App):
         print(f"Advancing to screen {index}")
         self.root.show(self.screens[index])
 
+    def func_overlay(self, img: str, text: str):
+        overlay = Overlay(self.root.size, img, text)
+        overlay.bind(on_touch_down=lambda *_: overlay.dismiss())
+        self.root.add_widget(overlay)
 
     # populate root windows and display generic main menu
     def build(self):
@@ -96,6 +104,7 @@ class RPG(App):
         main_menu = MenuLayout("pics/menus/main.jpg", "my game")
         main_menu.add_button(self.func_play, text="play")
         main_menu.add_button(self.func_exit, text="exit")
+        main_menu.add_button(self.func_demo, text="DEMO")
         self.screens[0] = main_menu # main menu will always be index 0
         self.root.show(main_menu)
         return self.root
