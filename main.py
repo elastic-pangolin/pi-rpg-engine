@@ -71,7 +71,7 @@ class RPG(App):
         demo_menu.add_button(self.func_reset, text="RETURN TO MAIN MENU")
         demo_menu.add_button(lambda: self.func_overlay("pics/menus/main.jpg", "TEST"), text="test overlay")
         self.screens[2] = demo_menu
-
+        self.root.show(self.screens[1])
 
     # ============== general functions : ==============
     # exit game
