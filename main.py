@@ -52,6 +52,13 @@ class RPG(App):
 
         # TODO: when to load save?
 
+        # key bindings
+        def rpg_hotkeys(window, key, scancode, codepoint, modifiers):
+            if codepoint == "i" or codepoint == "I":
+                self.game.list_inventory(self)
+            return True
+        Window.bind(on_key_down=rpg_hotkeys)
+
         if not len(game_screens) > 0:
             print("An error occurred loading the game!")
         else:
@@ -93,8 +100,8 @@ class RPG(App):
         print(f"Advancing to screen {index}")
         self.root.show(self.screens[index])
 
-    def func_overlay(self, img: str, text: str):
-        overlay = Overlay(self.root.size, img, text)
+    def func_overlay(self, img: str, text: str, frac=0.45):
+        overlay = Overlay(self.root.size, frac, img, text)
         overlay.bind(on_touch_down=lambda *_: overlay.dismiss())
         self.root.add_widget(overlay)
 

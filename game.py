@@ -13,11 +13,15 @@ class Command:
 class Game:
     def __init__(self):
         self.state = {
-            "inventory": [],
+            "inventory": {},
             "misc": {}
         }
+        self.items = {}
 
     def create_screens(self, rpg, data: dict):
+        if not self.items:
+            # read in item descriptors
+            self.items = data["items"].copy()
         screenlist = data["screens"]
         lookup = {}
         index = 1
@@ -40,7 +44,7 @@ class Game:
                         functions[functionindex].append(lambda t=text: rpg.func_overlay("", t))
                     # parse state-changing functions
                     if action["command"] == Command.EXIT:
-                        ...
+                        functions[functionindex].append(rpg.func_reset)
                     elif action["command"] == Command.SAVE:
                         ...
                     elif action["command"] == Command.LOAD:
@@ -51,10 +55,15 @@ class Game:
                     elif action["command"] == Command.ADDITEM:
                         itemname = action["details"].get("itemName")
                         amount = action["details"].get("amount")
-                        failuremessage = action["details"].get("failureMessage")
-                        ...
+                        functions[functionindex].append(lambda n=itemname, a=amount: self.add_inventory(n,a))
                     elif action["command"] == Command.LOOSEITEM:
-                        ...
+                        itemname = action["details"].get("itemName")
+                        amount = action["details"].get("amount")
+                        failuremessage = action["details"].get("failureMessage")
+                        def _cond_call(func_1, func_2):
+                            if not bool(func_1()):
+                                func_2()
+                        functions[functionindex].append( lambda n=itemname, a=amount, m=failuremessage: _cond_call(lambda: self.remove_inventory(n,a), lambda: rpg.func_overlay("", m)) )
                     elif action["command"] == Command.NOOP:
                         ...
                     else:
@@ -73,3 +82,37 @@ class Game:
 
     def persist(self, key: str, value):
         self.state[key] = value
+
+    def add_inventory(self, key: str, value: int):
+        if not self.state["inventory"].get(key):
+            self.state["inventory"][key] = 0
+        print(f"Added {value} {key}(s) to your inventory")
+        self.state["inventory"][key] += value
+        return True
+
+    def remove_inventory(self, key: str, value: int, min_left:int=0):
+        if self.state["inventory"].get(key):
+            if self.state["inventory"][key] - value >= min_left:
+                self.state["inventory"][key] -= value
+                print(f"Removed {value} {key}(s) from your inventory")
+                return True
+        return False
+
+    def list_inventory(self, rpg):
+        itemlist = []
+        for name, amount in self.state["inventory"].items():
+            if amount == 0:
+                continue
+            itementry = None
+            for entry in self.items:
+                if entry["name"] == name:
+                    itementry = entry
+                    break
+            if itementry:
+                if amount > 1:
+                    itemlist.append(f"{amount} {itementry.get('displayNamePlural')}")
+                else:
+                    itemlist.append(f"{amount} {itementry.get('displayNameSingular')}")
+            else:
+                itemlist.append(f"{amount} {name}")
+        rpg.func_overlay("", "Inventory [I] [LB][LB]" + "[LB]".join(itemlist), 0.75)
