@@ -1,4 +1,4 @@
-from kivy.graphics import Rectangle
+from kivy.graphics import Rectangle, Color, Line
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
@@ -10,45 +10,79 @@ from PIL import Image as GifImage
 
 from buttons import *
 
+def _layout_text(text: str, width: int):
+    words = str(text).split()
+    lines = []
+    current_line = ""
+    for word in words:
+         if len(current_line) + len(word) + 1 <= width:
+            current_line += (word if not current_line else " " + word)
+         else:
+            lines.append(current_line)
+            current_line = word
+    # add the last line
+    if current_line:
+        lines.append(current_line)
+    return "\n".join(lines).replace("[LB]", "\n") # [LB] are literal linebreaks
+
 # object to hold all layouts
 class ScreenRoot(FloatLayout):
     def show(self, widget):
         self.clear_widgets()
         self.add_widget(widget)
 
+class Overlay(Widget):
+    def __init__(self, parent_size, img_source, text, **kwargs):
+        super().__init__(**kwargs)
+        if not img_source:
+            img_source = "dark_grey.png"
+        self.width = parent_size[0] * 0.45
+        self.height = parent_size[1] * 0.45
+        self.size_hint = (None, None) # do not resize
+        self.pos = (
+            parent_size[0]*0.5 - self.width/2,
+            parent_size[1]*0.5 - self.height/2,
+        )
+        with self.canvas.before:
+            self.bg = Rectangle(source=img_source, pos=self.pos, size=self.size)
+            self.bg.texture.wrap = 'repeat' #'clamp_to_edge'
+            self.bg.texture.uvsize = (1,-1)
+        self.label = CoreLabel(
+            text=_layout_text(text,20),
+            font_name="UI",
+            font_size=dp(36),
+            halign='center',
+            valign='middle',
+            color=(1, 1, 1, 1),
+            #text_size=(self.width - dp(36), self.height - dp(36))
+        )
+        self.label.refresh()
+        with self.canvas.after:
+            self.text_rect = Rectangle(
+                texture=self.label.texture,
+                size=self.label.texture.size,
+                pos=(
+                    self.pos[0] + (self.width - self.label.texture.width)/2,
+                    self.pos[1] + (self.height - self.label.texture.height)/2,
+                )
+            )
+            #Color(1, 1, 0, 1) # DEBUGGING VISUALIZATION OUTLINE
+            #self.debug_border = Line(
+            #    rectangle=(self.x, self.y, self.width, self.height),
+            #    width=2
+            #)
+        self.bind(pos=self._update, size=self._update)
+
+    def _update(self, *args):
+        # since the overlay is not resized, the function is not called
+        ...
+
+    def dismiss(self):
+        if self.parent:
+            self.parent.remove_widget(self)
+
 # Menu layout
 class MenuLayout(BoxLayout):
-    def _update_all(self, *args):
-        self.bg.size = self.size
-        self.bg.pos = self.pos
-        # Center title near top
-        self.title_rect.pos = (
-            self.center_x - self.title_rect.size[0] / 2,
-            self.top - self.title_rect.size[1] - 40
-        )
-
-    def set_title(self, text):
-        self.title_label.text = text
-        self.title_label.refresh()
-        self.title_rect.texture = self.title_label.texture
-        self.title_rect.size = self.title_label.texture.size
-        self._update_all()
-
-    @staticmethod
-    def _layout_text(text: str, width: int):
-        words = str(text).split()
-        lines = []
-        current_line = ""
-        for word in words:
-            if len(current_line) + len(word) + 1 <= width:
-                current_line += (word if not current_line else " " + word)
-            else:
-                lines.append(current_line)
-                current_line = word
-        if current_line:
-            lines.append(current_line)
-        return "\n".join(lines).replace("[LB]", "\n") # [LB] are literal linebreaks
-
     def __init__(self, image_source, text, **kwargs):
         super().__init__(**kwargs)
         
@@ -65,11 +99,12 @@ class MenuLayout(BoxLayout):
 
         # Core text label (drawn, not widget)
         self.title_label = CoreLabel(
-            text=self._layout_text(text, 50),
+            text=_layout_text(text, 50),
             halign='center',
             font_name="UI",
             font_size=dp(36),
-            color=(1, 1, 1, 1)
+            color=(1, 1, 1, 1),
+            #text_size=(self.width - dp(36), self.height - dp(36))
         )
         self.title_label.refresh()
         with self.canvas.after:
@@ -82,6 +117,15 @@ class MenuLayout(BoxLayout):
         self.bind(size=self._update_all, pos=self._update_all)
         self._update_all()
 
+    def _update_all(self, *args):
+        self.bg.size = self.size
+        self.bg.pos = self.pos
+        # Center title near top
+        self.title_rect.pos = (
+            self.center_x - self.title_rect.size[0] / 2,
+            self.top - self.title_rect.size[1] - 40
+        )
+
     def _schedule_after_gif(self, func):
         gifimg = GifImage.open(self.gif.source)
         frame_count = gifimg.n_frames
@@ -90,6 +134,13 @@ class MenuLayout(BoxLayout):
         # Kivy always passes dt, so wrap your function
         #Clock.schedule_once(lambda dt: func(), duration)
         Clock.schedule_once(lambda dt: func(), duration)
+
+    def set_title(self, text):
+        self.title_label.text = text
+        self.title_label.refresh()
+        self.title_rect.texture = self.title_label.texture
+        self.title_rect.size = self.title_label.texture.size
+        self._update_all()
 
     def add_animation(self, func='UNDEFINED', gif=None):
         if not func and not gif:
@@ -109,6 +160,6 @@ class MenuLayout(BoxLayout):
         elif text:
             self.add_widget(TextButton(str(text), func, 
                 size_hint=(1, None), height=40,
-                font_name="UI", font_size=dp(28)))
+                font_name="UI", font_size=dp(36)))
         else:
             self.add_widget(Widget())  # Spacer
