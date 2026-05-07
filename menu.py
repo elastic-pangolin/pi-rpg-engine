@@ -10,20 +10,23 @@ from PIL import Image as GifImage
 
 from buttons import *
 
+# add linebreaks to text to be at most width characters long
 def _layout_text(text: str, width: int):
-    words = str(text).split()
+    original_lines = str(text).replace("[LB]", "\n").splitlines()
     lines = []
-    current_line = ""
-    for word in words:
-         if len(current_line) + len(word) + 1 <= width:
-            current_line += (word if not current_line else " " + word)
-         else:
+    for line in original_lines:
+        words = line.split()
+        current_line = ""
+        for word in words:
+            if len(current_line) + len(word) + 1 <= width:
+                current_line += (word if not current_line else " " + word.strip())
+            else:
+                lines.append(current_line.strip())
+                current_line = word
+        # add the last line
+        if current_line or not words:
             lines.append(current_line)
-            current_line = word
-    # add the last line
-    if current_line:
-        lines.append(current_line)
-    return "\n".join(lines).replace("[LB]", "\n") # [LB] are literal linebreaks
+    return "\n".join(lines)
 
 # object to hold all layouts
 class ScreenRoot(FloatLayout):
@@ -39,7 +42,8 @@ class Overlay(Widget):
         self.width = parent_size[0] * parent_frac
         self.height = parent_size[1] * parent_frac
         
-        text_len = int((self.width - dp(36)) / dp(36))
+        #text_len = int((self.width - dp(36)) / dp(36))# TODO: this formula does not return realistic values?
+        text_len = 2* int((self.width - dp(36)) / dp(36))
         
         self.size_hint = (None, None) # do not resize
         self.pos = (
