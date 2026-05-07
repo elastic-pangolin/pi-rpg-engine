@@ -48,7 +48,7 @@ class RPG(App):
                 print(f"Loading game from {filepath} ...")
                 data = json.load(gamefile)
                 game_screens = self.game.create_screens(self, data)
-                print(f"Game loaded: {len(game_screens)} screens")
+                print(f"Game loaded: {len(game_screens)-1} screens")
 
         # TODO: when to load save?
 
@@ -62,8 +62,9 @@ class RPG(App):
         if not len(game_screens) > 0:
             print("An error occurred loading the game!")
         else:
-            self.screens = [self.screens[0]] + game_screens # game screen indices start at 1 !!!
-        
+            game_screens[0] = self.screens[0] # game screen indices start at 1 !!!
+            self.screens = game_screens
+
         self.root.show(self.screens[1]) # show first game screen at index 1
 
     def func_demo(self):

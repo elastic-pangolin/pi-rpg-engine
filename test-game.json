@@ -89,10 +89,10 @@
                             }
                         },
                         {
-                            "command": "AddItem",
+                            "command": "ExchangeItem",
                             "details": {
-                                "itemName": "goldcoin",
-                                "amount": 3
+                                "addItemName": "goldcoin",
+                                "addAmount": 3
                             }
                         }
                     ]
@@ -120,18 +120,12 @@
                     "text": "A dead rat (2 GP)",
                     "actions": [
                         {
-                            "command": "LooseItem",
+                            "command": "ExchangeItem",
                             "details": {
-                                "itemName": "goldcoin",
-                                "amount": 2,
-                                "failureMessage": "You do not have enough money!"
-                            }
-                        },
-                        {
-                            "command": "AddItem",
-                            "details": {
-                                "itemName": "rat",
-                                "amount": 1
+                                "removeItemName": "goldcoin",
+                                "removeAmount": 2,
+                                "addItemName": "rat",
+                                "addAmount": 1
                             }
                         }
                     ]
@@ -140,18 +134,38 @@
                     "text": "A green spotted egg (5 GP)",
                     "actions": [
                         {
-                            "command": "LooseItem",
+                            "command": "ExchangeItem",
                             "details": {
-                                "itemName": "goldcoin",
-                                "amount": 5,
-                                "failureMessage": "You do not have enough money!"
+                                "removeItemName": "goldcoin",
+                                "removeAmount": 5,
+                                "addItemName": "egg",
+                                "addAmount": 1
                             }
-                        },
+                        }
+                    ]
+                },
+                {
+                    "text": "A dagger inset with deep red gems (500 GP)",
+                    "actions": [
                         {
-                            "command": "AddItem",
+                            "command": "ExchangeItem",
                             "details": {
-                                "itemName": "egg",
-                                "amount": 1
+                                "removeItemName": "goldcoin",
+                                "removeAmount": 500,
+                                "removeFailureMessage": "'I don't think you have the coin for such an item', the merchant grins",
+                                "addItemName": "dagger",
+                                "addAmount": 1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "text": "That's all for now (Leave shop)",
+                    "actions": [
+                        {
+                            "command": "Transition",
+                            "details": {
+                                "nextScreen": "road1"
                             }
                         }
                     ]
@@ -173,7 +187,14 @@
         {
             "name": "egg",
             "displayNameSingular": "Green Egg",
-            "displayNamePlural": ""
+            "displayNamePlural": "",
+            "max": 1
+        },
+        {
+            "name": "dagger",
+            "displayNameSingular": "Ruby-Socketed Dagger",
+            "displayNamePlural": "",
+            "max": 1
         }
     ]
 }

@@ -138,6 +138,7 @@ class MenuLayout(BoxLayout):
         #Clock.schedule_once(lambda dt: func(), duration)
         Clock.schedule_once(lambda dt: func(), duration)
 
+    # if title should be adjusted after init
     def set_title(self, text):
         self.title_label.text = text
         self.title_label.refresh()
@@ -166,3 +167,10 @@ class MenuLayout(BoxLayout):
                 font_name="UI", font_size=dp(36)))
         else:
             self.add_widget(Widget())  # Spacer
+
+    # for debugging: overwrite to-string-function
+    def __str__(self):
+        if hasattr(self, "title_label"):
+            return str(self.title_label.text)
+        else:
+            return "untitled ManuLayout"
