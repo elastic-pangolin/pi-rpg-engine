@@ -1,4 +1,5 @@
 from menu import *
+from pathlib import Path
 
 # commands recognized in game.json
 class Command:
@@ -7,6 +8,7 @@ class Command:
     LOAD = "Load" # Load save?
     TRANSITION = "Transition" # transition to another screen
     EXCHANGEITEM = "ExchangeItem" # modify the amounts of things in the inventory, one value is added, the other removed
+    PERSIST = "Persist" # save a value to a non-item state slot
     NOOP = "Noop" # print details text (optional)
 
 class Game:
@@ -16,6 +18,7 @@ class Game:
             "misc": {}
         }
         self.items = {}
+        self.default_savefile = "saves/auto.json" # TODO: should saves be encoded?
 
     def create_screens(self, rpg, data: dict):
         if not self.items:
@@ -54,17 +57,22 @@ class Game:
                     # parse state-changing functions
                     if action["command"] == Command.EXIT:
                         functions[functionindex].append(rpg.func_reset)
-
+                    # save to default save-file
                     elif action["command"] == Command.SAVE:
-                        ... #TODO
-
+                        functions[functionindex].append(self.save_to_file(rpg, self.default_savefile))
+                    # load from default save-file
                     elif action["command"] == Command.LOAD:
-                        ... #TODO
-
+                        functions[functionindex].append(self.load_from_file(rpg, self.default_savefile))
+                    # save non-item information (will not be printed to inventory)
+                    elif action["command"] == Command.PERSIST:
+                        var_key = action["details"].get("key")
+                        var_value = action["details"].get("value")
+                        functions[functionindex].append(lambda k=var_key, v=var_value: self.persist(k,v))
+                    # Scene transition in the state machine
                     elif action["command"] == Command.TRANSITION:
                         nextname = action["details"].get("nextScreen")
                         functions[functionindex].append(lambda i=lookup[nextname]: rpg.func_advance(i))
-
+                    # exchanging items with the world
                     elif action["command"] == Command.EXCHANGEITEM:
                         # first, try to remove the remove-item (if any) and on success,
                         # add the add-item. on add failure, the transaction of reverted
@@ -112,10 +120,36 @@ class Game:
 
         return screens
 
-    def persist(self, key: str, value):
-        self.state[key] = value
+    # save to a specified file, if any, else open save menu to choose the file
+    def save_to_file(self, rpg, filename: str = None):
+        if filename:
+            # creates the file if it does not exist
+            try:
+                with open(filename, "w", encoding="utf-8") as save:
+                    print(f"Saving game state into file {str(filename)}")
+                    save.write(json.dumps(self.state))
+            except:
+                rpg.func_overlay("", f"Could not save to {str(filename)}", 0.25)
+        else:
+            # TODO: add buttons to an overlay?
+            rpg.func_overlay("", "Save [S] [LB][LB] " + "[LB]".join([f.name for f in Path("saves/").glob("*.json")]), 1)
 
-    def get_iteminfo(self, key: str):
+    def load_from_file(self, rpg, filename: str = None):
+        if filename:
+            try:
+                with open(filename, "r", encoding="utf-8") as save:
+                    print(f"Loading game state from file {str(filename)}")
+                    self.state = json.loads(save.read())
+            except:
+                rpg.func_overlay(f"Could not load from {str(filename)}")
+        else:
+            # TODO: add buttons to overlay?
+            rpg.func_overlay("", "Load [L] [LB][LB] " + "[LB]".join([f.name for f in Path("saves/").glob("*.json")]), 1)
+
+    def persist(self, key: str, value):
+        self.state[key] = value # TODO: write into 'misc' section?
+
+    def _get_iteminfo(self, key: str):
         for entry in self.items:
             if entry["name"] == key:
                 return entry
@@ -124,7 +158,7 @@ class Game:
     def add_inventory(self, key: str, value: int):
         if key == None:
             return True
-        itementry = self.get_iteminfo(key)
+        itementry = self._get_iteminfo(key)
         if not itementry:
             print(f"Item '{key}' unknown")
             return True
@@ -142,7 +176,7 @@ class Game:
     def remove_inventory(self, key: str, value: int, min_left:int=0):
         if key == None:
             return True
-        itementry = self.get_iteminfo(key)
+        itementry = self._get_iteminfo(key)
         if not itementry:
             print(f"Item '{key}' unknown")
             return True
@@ -161,7 +195,7 @@ class Game:
         for name, amount in self.state["inventory"].items():
             if amount == 0:
                 continue
-            itementry = self.get_iteminfo(name)
+            itementry = self._get_iteminfo(name)
             if itementry:
                 if amount > 1:
                     itemlist.append(f"{amount} {itementry.get('displayNamePlural')}")
