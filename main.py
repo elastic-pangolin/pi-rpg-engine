@@ -54,8 +54,14 @@ class RPG(App):
 
         # key bindings
         def rpg_hotkeys(window, key, scancode, codepoint, modifiers):
-            if codepoint == "i" or codepoint == "I":
+            if key == 27: # Escape
+                self.func_reset()
+            elif codepoint.upper() == "I":
                 self.game.list_inventory(self)
+            elif codepoint.upper() == "S":
+                self.game.save_to_file(self) # TODO: choose save files?
+            elif codepoint.upper() == "L":
+                self.game.load_from_file(self) # TODO: choose save file?
             return True
         Window.bind(on_key_down=rpg_hotkeys)
 
