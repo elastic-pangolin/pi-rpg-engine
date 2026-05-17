@@ -15,17 +15,19 @@ def _layout_text(text: str, width: int):
     original_lines = str(text).replace("[LB]", "\n").splitlines()
     lines = []
     for line in original_lines:
-        words = line.split()
-        current_line = ""
-        for word in words:
-            if len(current_line) + len(word) + 1 <= width:
-                current_line += (word if not current_line else " " + word.strip())
-            else:
-                lines.append(current_line.strip())
-                current_line = word
-        # add the last line
-        if current_line or not words:
-            lines.append(current_line)
+        if len(line) <= width:
+            lines.append(line)
+        else:
+            current_line = ""
+            for word in line.split():
+                if len(current_line) + len(word) + 1 <= width:
+                    current_line += (word if not current_line else " " + word.strip())
+                else:
+                    lines.append(current_line.strip())
+                    current_line = word
+            # add the last (new) line
+            if current_line:
+                lines.append(current_line)
     return "\n".join(lines)
 
 # object to hold all layouts
