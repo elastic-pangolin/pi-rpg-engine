@@ -83,14 +83,26 @@
                     "text": "Look into the gutter",
                     "actions": [
                         {
-                            "command": "Noop",
+                            "command": "Persist",
                             "details": {
-                                "message": "You find 3 goldcoins!"
+                                "formula": "add",
+                                "key": "gutter_cash_taken",
+                                "value": 1
+                            }
+                        },
+                        {
+                            "command": "Condition",
+                            "details": {
+                                "formula": "smaller",
+                                "key": "gutter_cash_taken",
+                                "value": 4,
+                                "failureMessage": "There is only grime left here"
                             }
                         },
                         {
                             "command": "ExchangeItem",
                             "details": {
+                                "message": "You find 3 goldcoins!",
                                 "addItemName": "goldcoin",
                                 "addAmount": 3
                             }

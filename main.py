@@ -44,14 +44,14 @@ class RPG(App):
     # Start series of layouts from game.json file
     def func_play(self):
         #print("Button 'play' clicked")
-        self.game = Game()
+        self.game = Game(self)
         game_screens = list()
         filepath = "test-game.json"
         if os.path.exists(filepath):
             with open(filepath, "r") as gamefile:
                 print(f"Loading game from {filepath} ...")
                 data = json.load(gamefile)
-                game_screens = self.game.create_screens(self, data)
+                game_screens = self.game.create_screens(data)
                 print(f"Game loaded: {len(game_screens)-1} screens")
 
         # TODO: when to load save?
@@ -61,11 +61,11 @@ class RPG(App):
             if key == 27: # Escape
                 self.func_reset()
             elif codepoint.upper() == "I":
-                self.game.list_inventory(self)
+                self.game.list_inventory()
             elif codepoint.upper() == "S":
-                self.game.save_to_file(self) # TODO: choose save files?
+                self.game.save_to_file() # TODO: choose save files?
             elif codepoint.upper() == "L":
-                self.game.load_from_file(self) # TODO: choose save file?
+                self.game.load_from_file() # TODO: choose save file?
             return True
         Window.bind(on_key_down=rpg_hotkeys)
 
