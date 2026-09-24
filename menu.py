@@ -89,6 +89,7 @@ class Overlay(Widget):
     def dismiss(self):
         if self.parent:
             self.parent.remove_widget(self)
+        return True
 
 # Menu layout
 class MenuLayout(BoxLayout):
