@@ -46,7 +46,7 @@ class RPG(App):
         #print("Button 'play' clicked")
         self.game = Game(self)
         game_screens = list()
-        filepath = "test-game.json"
+        filepath = "test-game.json" # "arriving_game.json"
         if os.path.exists(filepath):
             with open(filepath, "r") as gamefile:
                 print(f"Loading game from {filepath} ...")
@@ -111,7 +111,7 @@ class RPG(App):
         print(f"Advancing to screen {index}")
         self.root.show(self.screens[index])
 
-    def func_overlay(self, img: str, text: str, frac=0.45):
+    def func_overlay(self, img: str, text: str, frac=0.95):
         overlay = Overlay(self.root.size, frac, img, text)
         overlay.bind(on_touch_down=lambda *_: overlay.dismiss())
         self.root.add_widget(overlay)

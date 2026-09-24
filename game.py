@@ -53,6 +53,7 @@ class Game:
             # read in item descriptors
             self.items = data["items"].copy()
         screenlist = data["screens"]
+        print(f"Loaded {len(screenlist)} screens")
         lookup = {}
         index = 1 # index 0 is reserved for main menu
         # assign indices to screen names
@@ -63,6 +64,9 @@ class Game:
         functions = {}
         functionindex = 0
         for screen in screenlist:
+            if screen.get("header") is None or screen.get("description") is None or screen.get("options") is None:
+                print(f"Malformed screen is missing json fields: {screen}")
+                continue
             # [LB] are literal linebreaks
             layout = MenuLayout("", screen["header"] + "[LB][LB]" + screen["description"])
             for option in screen["options"]:
