@@ -11,8 +11,7 @@ dependencies = [
     "docutils", # for kivy
     "Kivy-Garden", # for kivy
     "pygments", # for kivy
-    "requests", # for kivy
-    "pygame" # for kivy
+    "requests" # for kivy
 ]
 requires-python = ">=3.10"
 [project.optional-dependencies]

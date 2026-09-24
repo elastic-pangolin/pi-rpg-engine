@@ -2,14 +2,18 @@ import os
 import sys
 import json
 
+os.environ['KIVY_WINDOW'] = 'sdl2'
+os.environ['KIVY_HOME'] = os.path.dirname(os.path.abspath(__file__))
 
 from kivy.config import Config
+Config.set('kivy', 'log_level', 'debug')
 Config.set('graphics', 'fullscreen', '0')
 Config.set('graphics', 'resizable', '0')
 Config.set('graphics', 'resizable', False)
 Config.set('graphics', 'width', '768')
 Config.set('graphics', 'height', '512')
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+Config.write()
 
 from kivy.app import App
 from kivy.core.window import Window
